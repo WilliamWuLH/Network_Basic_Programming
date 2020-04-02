@@ -1,18 +1,34 @@
-# -*- coding:utf-8 -*-
-
 import socket
-ip_port = ('127.0.0.1',5050)
+import time
+import sys
 
-while True:
-    sk = socket.socket()
-    sk.connect(ip_port)
-    massage = input("Client : ").strip()
-    if massage == "exit":
-        break
-    sk.sendall(("Client : " + massage).encode())
-    print("client waiting...")
-    server_reply = sk.recv(1024)
-    print (server_reply.decode())
+IP = '127.0.0.1'
+PORT = 5050
+CLI_ADDR = IP,PORT
+BUFFSIZE = 1024
+
+def client_socket():
+    try:
+        sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sk.connect(CLI_ADDR)
+    except socket.error as msg:
+        print(msg)
+        sys.exit(1)
+
+    print(sk.recv(BUFFSIZE))
+    while True:
+        massage = input("Client : ").strip()
+        sk.send(massage.encode())
+
+        print("client waiting...")
+        server_reply = sk.recv(BUFFSIZE)
+        print (server_reply.decode())
+        if massage == "exit":
+            break      
+
     sk.close()
+
+if __name__ == "__main__":
+    client_socket()
 
 #socket client
